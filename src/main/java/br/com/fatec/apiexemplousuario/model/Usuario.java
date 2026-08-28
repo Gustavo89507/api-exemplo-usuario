@@ -1,0 +1,30 @@
+package br.com.fatec.apiexemplousuario.model;
+
+public class Usuario {
+    private String nome;
+    private int idade;
+
+
+
+    public Usuario(){}
+    public Usuario(String nome,int idade) {
+        this.idade = idade;
+        this.nome = nome;
+    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setIdade(int idade) {
+        this.idade = idade;
+    }
+
+    public int getIdade() {
+        return idade;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+}
