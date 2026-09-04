@@ -15,12 +15,12 @@ public class UsuarioController {
     }
     // GET - listar todos os usuários
     @GetMapping
-    public ResponseEntity<List<Usuario>> listar() {
+        public ResponseEntity<List<Usuario>> listar() {
         return ResponseEntity.ok(usuarioService.listar());
     }
     // GET - buscar usuário por índice
     @GetMapping("/{indice}")
-    public ResponseEntity<Usuario> buscarPorIndice(@PathVariable int indice) {
+        public ResponseEntity<Usuario> buscarPorIndice(@PathVariable int indice) {
         Usuario usuario = usuarioService.buscarPorIndice(indice);
         if (usuario == null) {
             return ResponseEntity.notFound().build();
@@ -29,13 +29,13 @@ public class UsuarioController {
     }
     // POST - adicionar usuário
     @PostMapping
-    public ResponseEntity<Usuario> adicionar(@RequestBody Usuario usuario) {
-        Usuario novoUsuario = usuarioService.adicionar(usuario);
+        public ResponseEntity<Usuario> adicionar(@RequestBody Usuario usuario) {
+            Usuario novoUsuario = usuarioService.adicionar(usuario);
         return ResponseEntity.status(201).body(novoUsuario);
     }
     // PUT - atualizar usuário
     @PutMapping("/{indice}")
-    public ResponseEntity<Usuario> atualizar(
+        public ResponseEntity<Usuario> atualizar(
             @PathVariable int indice,
             @RequestBody Usuario usuario) {
         Usuario usuarioAtualizado = usuarioService.atualizar(indice, usuario);
@@ -46,7 +46,7 @@ public class UsuarioController {
     }
     // DELETE - remover usuário
     @DeleteMapping("/{indice}")
-    public ResponseEntity<Void> deletar(@PathVariable int indice) {
+        public ResponseEntity<Void> deletar(@PathVariable int indice) {
         boolean removido = usuarioService.deletar(indice);
         if (!removido) {
             return ResponseEntity.notFound().build();
