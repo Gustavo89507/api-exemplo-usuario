@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -15,42 +16,49 @@ public class UsuarioController {
     }
     // GET - listar todos os usuários
     @GetMapping
-        public ResponseEntity<List<Usuario>> listar() {
+    public ResponseEntity<List<Usuario>> listar() {
         return ResponseEntity.ok(usuarioService.listar());
     }
-    // GET - buscar usuário por índice
-    @GetMapping("/{indice}")
-        public ResponseEntity<Usuario> buscarPorIndice(@PathVariable int indice) {
-        Usuario usuario = usuarioService.buscarPorIndice(indice);
-        if (usuario == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(usuario);
+    // GET - buscar usuário por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Integer id) {
+        Optional<Usuario> usuario = usuarioService.buscarPorId(id);
+        return usuario.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
     // POST - adicionar usuário
     @PostMapping
-        public ResponseEntity<Usuario> adicionar(@RequestBody Usuario usuario) {
-            Usuario novoUsuario = usuarioService.adicionar(usuario);
-        return ResponseEntity.status(201).body(novoUsuario);
+    public ResponseEntity<Usuario> salvar(@RequestBody Usuario usuario) {
+        Usuario novoUsuario = usuarioService.salvar(usuario);
+        return ResponseEntity.ok(novoUsuario);
     }
     // PUT - atualizar usuário
-    @PutMapping("/{indice}")
-        public ResponseEntity<Usuario> atualizar(
-            @PathVariable int indice,
-            @RequestBody Usuario usuario) {
-        Usuario usuarioAtualizado = usuarioService.atualizar(indice, usuario);
-        if (usuarioAtualizado == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(usuarioAtualizado);
+    @PutMapping("/{id}")
+    public ResponseEntity<Usuario> atualizar(@PathVariable Integer id, @RequestBody Usuario usuario)
+    {
+        return usuarioService.buscarPorId(id).map(u -> {
+            u.setNome(usuario.getNome());
+            u.setIdade(usuario.getIdade());
+            Usuario atualizado = usuarioService.salvar(u);
+            return ResponseEntity.ok(atualizado);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
+    /* melhor
+    @PutMapping("/{id}")
+    public ResponseEntity<Usuario> atualizar(@PathVariable Integer id, @RequestBody Usuario usuario) {
+     return usuarioService.atualizar(id, usuario)
+     .map(ResponseEntity::ok)
+     .orElse(ResponseEntity.notFound().build());
+    }
+    */
     // DELETE - remover usuário
-    @DeleteMapping("/{indice}")
-        public ResponseEntity<Void> deletar(@PathVariable int indice) {
-        boolean removido = usuarioService.deletar(indice);
-        if (!removido) {
-            return ResponseEntity.notFound().build();
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        if (usuarioService.buscarPorId(id).isPresent()) {
+            usuarioService.deletar(id);
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 }
+
