@@ -25,7 +25,8 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
     // Metodo de Atualização (Update)
-    public Optional<Usuario> atualizar(Integer id, Usuario usuarioAtualizado) {
+    public Optional<Usuario> atualizar(Integer id, Usuario
+            usuarioAtualizado) {
         return usuarioRepository.findById(id).map(usuarioExistente -> {
             usuarioExistente.setNome(usuarioAtualizado.getNome());
             usuarioExistente.setIdade(usuarioAtualizado.getIdade());
