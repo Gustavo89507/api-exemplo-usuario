@@ -4,11 +4,13 @@ import br.com.fatec.apiexemplousuario.model.Usuario;
 import br.com.fatec.apiexemplousuario.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
     private final UsuarioService usuarioService;
     public UsuarioController(UsuarioService usuarioService){
@@ -30,12 +32,14 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<Usuario> salvar(@RequestBody Usuario usuario) {
         Usuario novoUsuario = usuarioService.salvar(usuario);
-        return ResponseEntity.ok(novoUsuario);
+        return ResponseEntity.status(201).body(novoUsuario);
     }
     // PUT - atualizar usuário
-    @PutMapping
-    public ResponseEntity<Usuario> atualizar(@RequestParam Integer
-                                                     id,@RequestBody Usuario usuario) {
+    //Atualizar
+    @PutMapping("/{id}")
+    public ResponseEntity<Usuario> atualizar(
+            @PathVariable("id") Integer id,
+            @RequestBody Usuario usuario) {
         return usuarioService.atualizar(id, usuario)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -56,5 +60,19 @@ public class UsuarioController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+    @PostMapping("/importar")
+    public ResponseEntity<String> importarArquivo(
+            @RequestParam("arquivo") MultipartFile arquivo) {
+        try {
+            int quantidade = usuarioService.importarArquivo(arquivo);
+            return ResponseEntity.ok(
+                    quantidade + " usuários importados com sucesso."
+            );
+        } catch (IllegalArgumentException erro) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Arquivo inválido: " + erro.getMessage());
+        }
     }
 }
